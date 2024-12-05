@@ -14,8 +14,30 @@
     </script>
 </head>
 <body>
-    <div class="back-to-main">
-        <a href="index.html">メイン画面に戻る</a>
+    <div class="container">
+        <h1>夢の追加</h1>
+
+            <label for="dream-title">タイトル:</label><br>
+            <input type="text" id="dream-title" name="dream-title"><br><br>
+
+            <label for="dream-content">内容:</label><br>
+            <textarea id="dream-content" name="dream-content"></textarea><br><br>
+
+            <label for="dream-emotion">感情:</label><br>
+            <select id="dream-emotion" name="dream-emotion">
+                <option value="joy">喜び</option>
+                <option value="sorrow">悲しみ</option>
+                <option value="anger">怒り</option>
+                <option value="fear">恐怖</option>
+                <option value="others">その他</option>
+            </select><br><br>
+
+            <button type="button" id="save-button">保存</button>
+
+        <div class="back-to-main">
+          <a href="index.html">メイン画面に戻る</a>
+        </div>
     </div>
+
 </body>
 </html>

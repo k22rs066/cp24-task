@@ -1,2 +1,12 @@
 /**/
+body{
+    /* font-family: ; */
+    background-color: #f8f9fa;
+}
 
+.container {
+  /* 画面全体のスタイル */
+  width: 90%;
+  margin: 0 auto;
+  padding: 20px;
+}
