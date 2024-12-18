@@ -1,44 +1,130 @@
 <!DOCTYPE HTML>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
-    <script src="cordova.js"></script>
-    <link rel="stylesheet" href="components/loader.css">
-    <script src="components/loader.js"></script>
-    <script>
-        //
-        // TODO: Write JavaScript code here
-        //
-    </script>
-</head>
-<body>
-    <div class="container">
-        <h1>夢の追加</h1>
-            <!-- ここにカレンダー表示を追加する -->
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport"content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+        <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'"
+        />
+        <!-- <script src="cordova.js"></script> -->
+        <link rel="stylesheet" href="components/loader.css"/>
+        <link rel="stylesheet" href="css/style.css" />
+        <script src="components/loader.js"></script>
 
-            <label for="dream-title">タイトル:</label><br>
-            <input type="text" id="dream-title" name="dream-title"><br><br>
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+        <script src="www/config.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            let postsRef;
 
-            <label for="dream-content">内容:</label><br>
-            <textarea id="dream-content" name="dream-content"></textarea><br><br>
+            // メッセージ表示処理
+            function showMessage(message, type = 'success') {
+                const messageArea = $('#messageArea');
+                messageArea.html(`
+                    <div class="message ${type}">
+                        ${message}
+                    </div>
+                `);
 
-            <label for="dream-emotion">感情:</label><br>
+                // 3秒後にメッセージを消す
+                setTimeout(() => {
+                    messageArea.empty();
+                }, 3000);
+            }
+
+            // 認証エラーメッセージの日本語化
+            function getAuthErrorMessage(error) {
+                // エラーコードがある場合
+                if (error.code) {
+                    return `認証エラーが発生しました（${error.code}）`;
+                } else if (error.message) {
+                    return `エラーが発生しました：${error.message}`;
+                } else {
+                    return 'エラーが発生しました';
+                }
+            }
+
+
+            // ページ読み込み時に実行
+            $(document).ready(function () {
+                // Firebaseの初期化
+                firebase.initializeApp(firebaseConfig);
+
+                // データベースの参照を初期化
+                postsRef = firebase.database().ref('posts');
+
+                // 保存ボタンのクリックイベント
+                $('#save-button').click(function () {
+                    saveDream();
+                });
+            });
+
+
+            function saveDream() {
+                const date = $('#dream-date').val();
+                const title = $('#dream-title').val();
+                const content = $('#dream-content').val();
+                const emotion = $('#dream-emotion').val();
+
+                // バリデーション
+                if (!date || !title || !content) {
+                    showMessage('日付、タイトル、内容は必須です', 'error');
+                    return;
+                }
+
+                // Firebaseに保存
+                const timestamp = new Date(date).getTime();
+                postsRef.push({
+                    date: date,
+                    title: title,
+                    content: content,
+                    emotion: emotion,
+                    timestamp: timestamp
+                })
+                .then(() => {
+                    showMessage('夢を保存しました');
+                    // 入力欄クリア
+                    $('#dream-date').val('');
+                    $('#dream-title').val('');
+                    $('#dream-content').val('');
+                    $('#dream-emotion').val('joy');
+                    window.location.href = 'index.html'; // index.htmlへリダイレクト
+                })
+                .catch((error) => {
+                    showMessage(getAuthErrorMessage(error), 'error');
+                });
+            }
+        </script>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1 class="main-title">夢の追加</h1>
+            <label for="dream-date">日付:</label><br />
+            <input type="date" id="dream-date" name="dream-date" /><br><br>
+
+            <label for="dream-title">タイトル:</label><br />
+            <input
+                type="text" id="dream-title" name="dream-title"/><br><br>
+
+            <label for="dream-content">内容:</label><br />
+            <textarea id="dream-content" name="dream-content"></textarea><br /><br />
+
+            <label for="dream-emotion">感情:</label><br />
             <select id="dream-emotion" name="dream-emotion">
                 <option value="joy">喜び</option>
                 <option value="sorrow">悲しみ</option>
                 <option value="anger">怒り</option>
                 <option value="fear">恐怖</option>
                 <option value="others">その他</option>
-            </select><br><br>
+            </select><br /><br />
 
-            <button type="button" id="save-button">保存</button><br>
+            <button type="button" id="save-button">登録</button><br /><br />
 
-        <div class="back-to-main">
-          <a href="index.html">メイン画面に戻る</a>
+            <div class="back-to-main">
+                <a href="index.html">メイン画面に戻る</a>
+            </div>
         </div>
-    </div>
-
-</body>
+    </body>
 </html>

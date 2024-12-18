@@ -13,31 +13,166 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="www/config.js"></script>
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
     <script>
+        let postsRef;
+        let postsListener = null;
+        // 現在の編集対象のID
+        let currentEditId = null;
+        // ログイン中のユーザ
+        let currentUser = null;
 
+        // メッセージ表示処理
+        function showMessage(message, type = 'success') {
+            const messageArea = $('#messageArea');
+            messageArea.html(`
+                <div class="message ${type}">
+                    ${message}
+                </div>
+            `);
+
+            // 3秒後にメッセージを消す
+            setTimeout(() => {
+                messageArea.empty();
+            }, 3000);
+        }
+
+        // 認証エラーメッセージの日本語化
+        function getAuthErrorMessage(error) {
+            // エラーコードがある場合
+            if (error.code) {
+                return `認証エラーが発生しました（${error.code}）`;
+            } else if (error.message) {
+                return `エラーが発生しました：${error.message}`;
+            } else {
+                return 'エラーが発生しました';
+            }
+        }
+
+        // HTMLエスケープ処理
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, '&')
+                .replace(/</g, '<')
+                .replace(/>/g, '>')
+                .replace(/"/g, '"')
+                .replace(/'/g, ''');
+        }
+
+        // タイムスタンプのフォーマット
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString('ja-JP', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        // ページ読み込み時に実行
+        $(document).ready(function () {
+            // Firebaseの初期化
+            firebase.initializeApp(firebaseConfig);
+
+            // データベースの参照を初期化
+            postsRef = firebase.database().ref('posts');
+
+            // 夢の一覧を表示
+            displayDreams();
+
+             // 検索ボックスのイベント
+            $('#search-box').on('input', function () {
+                displayDreams();
+            });
+
+            // ソートドロップダウンのイベント
+            $('#sort-dropdown').on('change', function () {
+                displayDreams();
+            });
+
+        });
+
+       // 夢の一覧を表示する関数
+        function displayDreams() {
+            
+            if (postsListener) {
+                postsRef.off('value', postsListener);
+            }
+
+            // データの変更をリアルタイムに監視
+            postsListener = postsRef.on('value', (snapshot) => {
+                const dreams = [];
+                snapshot.forEach((childSnapshot) => {
+                    const dream = childSnapshot.val();
+                    dream.id = childSnapshot.key; 
+                    dreams.push(dream);
+                });
+                
+                const searchText = $('#search-box').val().toLowerCase();
+                const sortOption = $('#sort-dropdown').val();
+
+                 // 検索
+                const filteredDreams = dreams.filter(dream => {
+                     return (
+                        dream.title.toLowerCase().includes(searchText) ||
+                        dream.content.toLowerCase().includes(searchText) ||
+                        dream.emotion.toLowerCase().includes(searchText)
+                     );
+                });
+                
+                // ソート処理
+                filteredDreams.sort((a, b) => {
+                    if (sortOption === 'date-desc') {
+                       return b.timestamp - a.timestamp;
+                    } else if (sortOption === 'date-asc') {
+                        return a.timestamp - b.timestamp;
+                    } else if (sortOption === 'emotion') {
+                        return a.emotion.localeCompare(b.emotion);
+                    }
+                     return 0;
+                });
+
+
+                // 夢一覧のHTMLを生成
+                const dreamsHtml = filteredDreams.map(dream => `
+                    <div class="dream-item">
+                        <h3>${escapeHtml(dream.title)}</h3>
+                        <p>日付: ${formatTimestamp(dream.timestamp)}</p>
+                        <p>感情: ${escapeHtml(dream.emotion)}</p>
+                        <p>${escapeHtml(dream.content)}</p>
+                    </div>
+                `).join('');
+
+                // 夢一覧を表示
+                $('.contents h3').html(dreamsHtml);
+            });
+        }
     </script>
+    
 </head>
+
 <body>
 	<div class="container">
     <h1 class="main-title">見た夢を追加しよう！</h1>
     <div class="addButton">
-      <a href="add.html">夢の追加</a>
+        <a href="add.html">夢の追加</a>
     </div>
 
     <div class="contents">
-      <h2>夢一覧</h2>
+        <h2>夢一覧</h2>
 
-      <div class="search-area">
-        <input type="text" id="search-box" placeholder="キーワード検索">
-        <select id="sort-dropdown">
-          <option value="date-desc">日付 (新しい順)</option>
-          <option value="date-asc">日付 (古い順)</option>
-          <option value="emotion">感情</option>
+        <div class="search-area">
+            <input type="text" id="search-box" placeholder="キーワード検索">
+            <select id="sort-dropdown">
+            <option value="date-desc">日付 (新しい順)</option>
+            <option value="date-asc">日付 (古い順)</option>
+            <option value="emotion">感情</option>
         </select>
-      </div>
+    </div>
 
-      <h3>ここに夢の内容を表示する</h3>
+    <h3>ここに夢の内容を表示する</h3>
         
     </div>
   </div>

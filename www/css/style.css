@@ -5,12 +5,12 @@ body{
 }
 
 .container {
-  /* 画面全体のスタイル */
-  width: 90%;
-  margin: 0 auto;
-  padding: 20px;
+    /* 画面全体のスタイル */
+    width: 90%;
+    margin: 0 auto;
+    padding: 20px;
 }
 
 .main-title{
-    
+
 }
