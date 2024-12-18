@@ -53,11 +53,11 @@
         function escapeHtml(str) {
             if (!str) return '';
             return str
-                .replace(/&/g, '&')
-                .replace(/</g, '<')
-                .replace(/>/g, '>')
-                .replace(/"/g, '"')
-                .replace(/'/g, ''');
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
 
         // タイムスタンプのフォーマット
@@ -81,6 +81,12 @@
 
             // 夢の一覧を表示
             displayDreams();
+
+            if(window.location.hash === '#success'){
+                showMessage("夢が追加されました")
+                // リンクからハッシュを削除
+                history.replaceState(null, null, ' ')
+            }
 
              // 検索ボックスのイベント
             $('#search-box').on('input', function () {
@@ -155,25 +161,26 @@
 
 <body>
 	<div class="container">
-    <h1 class="main-title">見た夢を追加しよう！</h1>
-    <div class="addButton">
-        <a href="add.html">夢の追加</a>
-    </div>
+        <div id="messageArea"></div>
+        <h1 class="main-title">見た夢を追加しよう！</h1>
+        <div class="addButton">
+            <a href="add.html">夢の追加</a>
+        </div>
 
-    <div class="contents">
-        <h2>夢一覧</h2>
+        <div class="contents">
+            <h2>夢一覧</h2>
 
-        <div class="search-area">
-            <input type="text" id="search-box" placeholder="キーワード検索">
-            <select id="sort-dropdown">
-            <option value="date-desc">日付 (新しい順)</option>
-            <option value="date-asc">日付 (古い順)</option>
-            <option value="emotion">感情</option>
-        </select>
-    </div>
+            <div class="search-area">
+                <input type="text" id="search-box" placeholder="キーワード検索">
+                <select id="sort-dropdown">
+                <option value="date-desc">日付 (新しい順)</option>
+                <option value="date-asc">日付 (古い順)</option>
+                <option value="emotion">感情</option>
+            </select>
+        </div>
 
-    <h3>ここに夢の内容を表示する</h3>
-        
+        <h3>ここに夢の内容を表示する</h3>
+    
     </div>
   </div>
 </body>
