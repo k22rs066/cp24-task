@@ -3,9 +3,8 @@
     <head>
         <meta charset="utf-8"/>
         <meta name="viewport"content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-        <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'"
-        />
-        <!-- <script src="cordova.js"></script> -->
+        <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'"/>
+        <script src="cordova.js"></script>
         <link rel="stylesheet" href="components/loader.css"/>
         <link rel="stylesheet" href="css/style.css" />
         <script src="components/loader.js"></script>
@@ -45,7 +44,6 @@
                 }
             }
 
-
             // ページ読み込み時に実行
             $(document).ready(function () {
                 // Firebaseの初期化
@@ -59,7 +57,6 @@
                     saveDream();
                 });
             });
-
 
             function saveDream() {
                 const date = $('#dream-date').val();
