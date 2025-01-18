@@ -70,7 +70,7 @@ body {
 
 .search-area {
     margin-bottom: 25px;
-    display: flex;
+    /* display: flex; */
     align-items: center;
 }
 
@@ -89,6 +89,7 @@ body {
     border-radius: 5px;
     /* font-size: 1em; */
 }
+
 .message {
     padding: 12px;
     margin-bottom: 12px;
